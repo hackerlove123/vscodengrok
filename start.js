@@ -5,6 +5,7 @@ const axios = require("axios");
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
 const NGROK_AUTH_TOKEN = "2tEd9VIVsq4yjGzeuELkR33Uw12_7QvuNGXyPCb9Bty6r4jdK";
+const PASSWORD = "admin"; // Mật khẩu truy cập code-server
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
@@ -46,7 +47,8 @@ const startNgrokTunnel = async (port) => {
         setTimeout(async () => {
             try {
                 const tunnelUrl = await getNgrokTunnelUrl();
-                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}`);
+                const workspaceUrl = `${tunnelUrl}/?folder=/workspace`;
+                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${workspaceUrl}\n🔐 Mật khẩu: ${PASSWORD}`);
             } catch (error) {
                 await sendTelegramMessage("❌ Không thể lấy URL của Ngrok Tunnel.");
             }
@@ -59,7 +61,7 @@ const startNgrokTunnel = async (port) => {
 // Hàm khởi chạy code-server
 const startCodeServer = async () => {
     await sendTelegramMessage("🔄 Đang khởi chạy code-server...");
-    const codeServerProcess = exec("code-server --bind-addr 0.0.0.0:8080 --auth none");
+    const codeServerProcess = exec(`code-server --bind-addr 0.0.0.0:8080 --auth password --password ${PASSWORD}`);
     codeServerProcess.stderr.on("data", () => {});
     await waitForCodeServer();
     await sendTelegramMessage("✅ code-server đã sẵn sàng!");
