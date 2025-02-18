@@ -3,7 +3,7 @@ const axios = require("axios");
 
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
-const NGROK_AUTH_TOKEN = "2tEayseVr7xY4hwb8p0zb8SyXwp_5DpjUH9xE4xGcJ3TcYRjD"; // Thay thế bằng authtoken của bạn
+const NGROK_AUTH_TOKEN = "2tEbd43zeBVOhZKfr5BiQFjGCdW_4TtkL3MmgPDbj7PyY1gVq"; // Thay thế bằng authtoken của bạn
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
@@ -42,11 +42,17 @@ const waitForCodeServer = () => {
 const startNgrokTunnel = (port) => {
     return new Promise((resolve, reject) => {
         // Thêm authtoken cho ngrok
-        exec(`ngrok config add-authtoken ${NGROK_AUTH_TOKEN}`, (error) => {
+        exec(`ngrok config add-authtoken ${NGROK_AUTH_TOKEN}`, (error, stdout, stderr) => {
             if (error) {
                 console.error("Lỗi khi thêm authtoken cho ngrok:", error);
+                sendTelegramMessage("❌ Lỗi khi thêm authtoken cho ngrok.");
                 reject(new Error("Lỗi khi thêm authtoken cho ngrok."));
                 return;
+            }
+
+            // Gửi thông báo authtoken đã được lưu
+            if (stdout.includes("Authtoken saved to configuration file")) {
+                sendTelegramMessage("✅ Authtoken đã được lưu thành công!");
             }
 
             console.log("Authtoken đã được thêm thành công!");
@@ -72,13 +78,13 @@ const startNgrokTunnel = (port) => {
                 const errorOutput = data.toString();
                 console.error(`[ngrok] ${errorOutput}`);
 
-                // Gửi thông báo lỗi chi tiết về Telegram
+                // Gửi thông báo lỗi gọn gàng về Telegram
                 if (errorOutput.includes("ERR_NGROK_108")) {
                     sendTelegramMessage(
-                        `❌ Lỗi từ Ngrok: Tài khoản của bạn đang giới hạn 1 session. Vui lòng kiểm tra và dừng các session không cần thiết.\nChi tiết lỗi:\n${errorOutput}`
+                        "❌ Lỗi từ Ngrok: Tài khoản của bạn đang giới hạn 1 session. Vui lòng kiểm tra và dừng các session không cần thiết."
                     );
                 } else {
-                    sendTelegramMessage(`❌ Lỗi từ Ngrok:\n${errorOutput}`);
+                    sendTelegramMessage("❌ Lỗi từ Ngrok: Không thể khởi chạy tunnel.");
                 }
                 reject(new Error(errorOutput)); // Reject nếu có lỗi
             });
