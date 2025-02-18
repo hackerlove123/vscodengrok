@@ -35,7 +35,7 @@ const waitForCodeServer = () => new Promise((resolve, reject) => {
 // Hàm khởi chạy Ngrok Tunnel
 const startNgrokTunnel = (port) => {
     // Thêm authtoken cho ngrok
-    exec("ngrok config add-authtoken 2tEbzHsKTGbNqjWlVdfxlZgbDgx_2qacZwbhswgb7MQ965Wxn", (error) => {
+    exec("ngrok config add-authtoken 2tEd9VIVsq4yjGzeuELkR33Uw12_7QvuNGXyPCb9Bty6r4jdK", (error) => {
         if (error) {
             console.error("Lỗi khi thêm authtoken cho ngrok:", error);
             sendTelegramMessage("❌ Lỗi khi thêm authtoken cho ngrok.");
@@ -47,14 +47,16 @@ const startNgrokTunnel = (port) => {
         // Khởi chạy ngrok tunnel
         const ngrokProcess = spawn("ngrok", ["http", port]);
 
+        let tunnelUrl = null;
+
         ngrokProcess.stdout.on("data", (data) => {
             const output = data.toString();
             console.log(`[ngrok] ${output}`);
 
             // Tìm URL của ngrok tunnel trong output
             const urlMatch = output.match(/https:\/\/[^ ]+/);
-            if (urlMatch) {
-                const tunnelUrl = urlMatch[0].trim();
+            if (urlMatch && !tunnelUrl) {
+                tunnelUrl = urlMatch[0].trim();
                 console.log(`🌐 URL: ${tunnelUrl}`);
                 sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}`);
             }
@@ -68,6 +70,15 @@ const startNgrokTunnel = (port) => {
             console.log(`Ngrok đã đóng với mã ${code}`);
             sendTelegramMessage(`🔴 Ngrok đã đóng với mã ${code}`);
         });
+
+        // Timeout sau 60 giây nếu không nhận được URL
+        setTimeout(() => {
+            if (!tunnelUrl) {
+                console.error("Không thể lấy được URL của Ngrok Tunnel sau 60 giây.");
+                sendTelegramMessage("❌ Không thể lấy được URL của Ngrok Tunnel sau 60 giây.");
+                ngrokProcess.kill();
+            }
+        }, 60000);
     });
 };
 
