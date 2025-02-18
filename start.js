@@ -1,5 +1,7 @@
 const { exec, spawn } = require("child_process");
 const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
 // Cấu hình
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
@@ -15,6 +17,14 @@ const sendTelegramMessage = async (message) => {
     } catch (error) {
         console.error("❌ Lỗi khi gửi tin nhắn:", error);
     }
+};
+
+// Hàm tạo thư mục làm việc ngẫu nhiên
+const createRandomWorkspace = () => {
+    const randomFolderName = `workspace_${Math.random().toString(36).substring(7)}`;
+    const workspacePath = path.join(__dirname, randomFolderName);
+    if (!fs.existsSync(workspacePath)) fs.mkdirSync(workspacePath);
+    return workspacePath;
 };
 
 // Hàm kiểm tra code-server
@@ -47,8 +57,7 @@ const startNgrokTunnel = async (port) => {
         setTimeout(async () => {
             try {
                 const tunnelUrl = await getNgrokTunnelUrl();
-                const workspaceUrl = `${tunnelUrl}/?folder=/workspace`;
-                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${workspaceUrl}\n🔐 Mật khẩu: ${PASSWORD}`);
+                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}\n🔐 Mật khẩu: ${PASSWORD}`);
             } catch (error) {
                 await sendTelegramMessage("❌ Không thể lấy URL của Ngrok Tunnel.");
             }
@@ -61,10 +70,11 @@ const startNgrokTunnel = async (port) => {
 // Hàm khởi chạy code-server
 const startCodeServer = async () => {
     await sendTelegramMessage("🔄 Đang khởi chạy code-server...");
-    const codeServerProcess = exec(`code-server --bind-addr 0.0.0.0:8080 --auth password --password ${PASSWORD}`);
+    const workspacePath = createRandomWorkspace();
+    const codeServerProcess = exec(`code-server --bind-addr 0.0.0.0:8080 --auth password --password ${PASSWORD} ${workspacePath}`);
     codeServerProcess.stderr.on("data", () => {});
     await waitForCodeServer();
-    await sendTelegramMessage("✅ code-server đã sẵn sàng!");
+    await sendTelegramMessage(`✅ code-server đã sẵn sàng!\n📂 Thư mục làm việc: ${workspacePath}`);
 };
 
 // Hàm chính
