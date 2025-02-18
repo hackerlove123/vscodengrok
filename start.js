@@ -3,7 +3,7 @@ const axios = require("axios");
 
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
-const NGROK_AUTH_TOKEN = "2tEaoHwfbA0LTJkbC45f9VqCOPY_3whV6RY223Agh3i4BByDm"; // Thay thế bằng authtoken của bạn
+const NGROK_AUTH_TOKEN = "2tEayseVr7xY4hwb8p0zb8SyXwp_5DpjUH9xE4xGcJ3TcYRjD"; // Thay thế bằng authtoken của bạn
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
