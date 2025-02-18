@@ -3,7 +3,7 @@ const axios = require("axios");
 
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
-const NGROK_AUTH_TOKEN = "2tEbd43zeBVOhZKfr5BiQFjGCdW_4TtkL3MmgPDbj7PyY1gVq"; // Thay thế bằng authtoken của bạn
+const NGROK_AUTH_TOKEN = "2tEbzHsKTGbNqjWlVdfxlZgbDgx_2qacZwbhswgb7MQ965Wxn"; // Thay thế bằng authtoken của bạn
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
@@ -60,14 +60,16 @@ const startNgrokTunnel = (port) => {
             // Khởi chạy ngrok tunnel
             const ngrokProcess = spawn("ngrok", ["http", port]);
 
+            let tunnelUrl = null;
+
             ngrokProcess.stdout.on("data", (data) => {
                 const output = data.toString();
                 console.log(`[ngrok] ${output}`);
 
                 // Tìm URL của ngrok tunnel trong output
                 const urlMatch = output.match(/https:\/\/[^ ]+/);
-                if (urlMatch) {
-                    const tunnelUrl = urlMatch[0].trim();
+                if (urlMatch && !tunnelUrl) {
+                    tunnelUrl = urlMatch[0].trim();
                     console.log(`🌐 URL: ${tunnelUrl}`);
                     sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}`);
                     resolve(tunnelUrl); // Trả về URL khi tìm thấy
@@ -91,7 +93,11 @@ const startNgrokTunnel = (port) => {
 
             ngrokProcess.on("close", (code) => {
                 console.log(`Ngrok đã đóng với mã ${code}`);
-                sendTelegramMessage(`🔴 Ngrok đã đóng với mã ${code}`);
+                if (!tunnelUrl) {
+                    sendTelegramMessage("🔴 Ngrok đã đóng mà không tạo được tunnel.");
+                } else {
+                    sendTelegramMessage(`🔴 Ngrok đã đóng với mã ${code}`);
+                }
                 reject(new Error(`Ngrok đã đóng với mã ${code}`));
             });
         });
