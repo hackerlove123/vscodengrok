@@ -1,0 +1,6 @@
+version: "2"
+authtoken: 2tEXCJqTfWD0ISxY23q4joQ08v8_5q4KXTJdoUXoUjBeJp8qD
+tunnels:
+  code-server:
+    addr: 8080
+    proto: http
