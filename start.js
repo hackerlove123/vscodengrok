@@ -3,6 +3,7 @@ const axios = require("axios");
 
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
+const NGROK_API_TOKEN = "2tEXCJqTfWD0ISxY23q4joQ08v8_5q4KXTJdoUXoUjBeJp8qD";
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
@@ -32,38 +33,35 @@ const waitForCodeServer = () => new Promise((resolve, reject) => {
     }, 30000);
 });
 
-// Hàm khởi chạy Cloudflare Tunnel
-const startCloudflaredTunnel = (port) => {
-    const cloudflaredProcess = spawn("cloudflared", ["tunnel", "--url", `http://localhost:${port}`]);
-    let isTunnelCreatedLine = false;
+// Hàm khởi chạy Ngrok Tunnel
+const startNgrokTunnel = (port) => {
+    const ngrokProcess = spawn("ngrok", ["http", port, "--authtoken", NGROK_API_TOKEN]);
+    let tunnelUrl = null;
 
     const handleOutput = (output) => {
         output.split("\n").forEach((line) => {
-            console.log(`[cloudflared] ${line}`);
-            if (line.includes("Your quick Tunnel has been created! Visit it at")) {
-                isTunnelCreatedLine = true;
-            } else if (isTunnelCreatedLine) {
-                const urlMatch = line.match(/https:\/\/[^"]+/);
+            console.log(`[ngrok] ${line}`);
+            if (line.includes("Forwarding")) {
+                const urlMatch = line.match(/https:\/\/[^\s]+/);
                 if (urlMatch) {
-                    const tunnelUrl = urlMatch[0].trim();
+                    tunnelUrl = urlMatch[0].trim();
                     console.log(`🌐 URL: ${tunnelUrl}`);
-                    sendTelegramMessage(`🌐 Cloudflare Tunnel đang chạy:\n${tunnelUrl}`);
-                    isTunnelCreatedLine = false;
+                    sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}`);
                 }
             }
         });
     };
 
-    cloudflaredProcess.stdout.on("data", (data) => handleOutput(data.toString()));
-    cloudflaredProcess.stderr.on("data", (data) => handleOutput(data.toString()));
-    cloudflaredProcess.on("close", (code) => {
-        console.log(`Cloudflared đã đóng với mã ${code}`);
-        sendTelegramMessage(`🔴 Cloudflared đã đóng với mã ${code}`);
+    ngrokProcess.stdout.on("data", (data) => handleOutput(data.toString()));
+    ngrokProcess.stderr.on("data", (data) => handleOutput(data.toString()));
+    ngrokProcess.on("close", (code) => {
+        console.log(`Ngrok đã đóng với mã ${code}`);
+        sendTelegramMessage(`🔴 Ngrok đã đóng với mã ${code}`);
     });
 };
 
-// Hàm khởi chạy code-server và Cloudflare Tunnel
-const startCodeServerAndCloudflared = async () => {
+// Hàm khởi chạy code-server và Ngrok Tunnel
+const startCodeServerAndNgrok = async () => {
     try {
         console.log("Đang khởi chạy code-server...");
         await sendTelegramMessage("🔄 Đang khởi chạy code-server...");
@@ -78,10 +76,10 @@ const startCodeServerAndCloudflared = async () => {
         console.log("✅ code-server đã sẵn sàng!");
         await sendTelegramMessage("✅ code-server đã sẵn sàng!");
 
-        console.log("Đang khởi chạy Cloudflare Tunnel...");
-        await sendTelegramMessage("🔄 Đang khởi chạy Cloudflare Tunnel...");
+        console.log("Đang khởi chạy Ngrok Tunnel...");
+        await sendTelegramMessage("🔄 Đang khởi chạy Ngrok Tunnel...");
 
-        startCloudflaredTunnel(8080);
+        startNgrokTunnel(8080);
     } catch (error) {
         console.error("Lỗi trong quá trình khởi chạy:", error);
         sendTelegramMessage(`❌ Lỗi trong quá trình khởi chạy: ${error.message}`);
@@ -89,4 +87,4 @@ const startCodeServerAndCloudflared = async () => {
 };
 
 // Khởi chạy mọi thứ
-startCodeServerAndCloudflared();
+startCodeServerAndNgrok();
