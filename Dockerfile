@@ -1,20 +1,11 @@
-# Sử dụng hình ảnh Node.js mới nhất
 FROM node:latest
-
-# Thiết lập thư mục làm việc
 WORKDIR /app
-
-# Cài đặt code-server, ngrok và axios
 RUN curl -fsSL https://code-server.dev/install.sh | sh && \
-    npm install -g ngrok && \
-    npm install axios && \
+    npm install -g ngrok axios && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Copy file start.js vào container
 COPY start.js /app/start.js
-
-# Mở port 8080
+COPY ngrok.yml /app/ngrok.yml
 EXPOSE 8080
 
 # Chạy script start.js khi container khởi động
