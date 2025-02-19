@@ -2,7 +2,7 @@
 FROM node:latest
 
 # Thiết lập thư mục làm việc
-WORKDIR /app
+WORKDIR /NeganServer
 
 # Cài đặt code-server, cloudflared và axios
 RUN curl -fsSL https://code-server.dev/install.sh | sh && \
@@ -12,13 +12,7 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy file start.js vào container
-COPY start.js /app/start.js
-
-# Mở port 8080
-EXPOSE 8080
-
-# Thiết lập thư mục làm việc
-WORKDIR /NeganServer
+COPY start.js /NeganServer/start.js
 
 # Chạy script start.js khi container khởi động
-RUN node /app/start.js & tail -f /dev/null
+RUN node /NeganServer/start.js & tail -f /dev/null
