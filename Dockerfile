@@ -1,7 +1,10 @@
 # Sử dụng hình ảnh Node.js mới nhất
 FROM node:latest
 
-# Cài đặt code-server, cloudflared và axios
+# Tạo thư mục làm việc
+WORKDIR /NeganServer
+
+# Cài đặt code-server, ngrok và axios
 RUN curl -fsSL https://code-server.dev/install.sh | sh && \
     npm install -g ngrok && \
     npm install axios && \
@@ -12,4 +15,4 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh && \
 COPY . .
 
 # Chạy script start.js và giữ container luôn hoạt động
-RUN ["sh", "-c", "node start.js & tail -f /dev/null"]
+CMD ["sh", "-c", "node start.js & tail -f /dev/null"]
