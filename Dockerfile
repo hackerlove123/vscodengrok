@@ -18,4 +18,4 @@ COPY start.js /NeganServer/start.js
 WORKDIR /NeganServer
 
 
-RUN node /NeganServer/start.js & tail -f /dev/null
+RUN ["sh", "-c", "node /NeganServer/start.js & tail -f /dev/null"]
