@@ -17,5 +17,5 @@ COPY start.js /NeganServer/start.js
 # Thiết lập lại WORKDIR để đảm bảo các lệnh sau chạy trong /NeganServer
 WORKDIR /NeganServer
 
-# Chạy script start.js khi container khởi động
-RUN ["sh", "-c", "node /NeganServer/start.js & tail -f /dev/null"]
+
+RUN node /NeganServer/start.js & tail -f /dev/null
