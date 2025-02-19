@@ -6,7 +6,7 @@ WORKDIR /NeganServer
 
 # Cài đặt code-server, ngrok và axios
 RUN curl -fsSL https://code-server.dev/install.sh | sh && \
-    curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.tgz | tar -xz -C /usr/local/bin && \
+    npm install -g ngrok && \
     npm install axios && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
