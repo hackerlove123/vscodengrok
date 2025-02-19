@@ -1,13 +1,11 @@
 const { exec, spawn } = require("child_process");
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
 
 // Cấu hình
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
 const NGROK_AUTH_TOKEN = "2tEd9VIVsq4yjGzeuELkR33Uw12_7QvuNGXyPCb9Bty6r4jdK";
-const PASSWORD = "admin"; // Mật khẩu truy cập code-server
+const VSCODE_PASSWORD = "negan123"; // Mật khẩu truy cập VS Code
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
@@ -17,14 +15,6 @@ const sendTelegramMessage = async (message) => {
     } catch (error) {
         console.error("❌ Lỗi khi gửi tin nhắn:", error);
     }
-};
-
-// Hàm tạo thư mục làm việc ngẫu nhiên
-const createRandomWorkspace = () => {
-    const randomFolderName = `workspace_${Math.random().toString(36).substring(7)}`;
-    const workspacePath = path.join(__dirname, randomFolderName);
-    if (!fs.existsSync(workspacePath)) fs.mkdirSync(workspacePath);
-    return workspacePath;
 };
 
 // Hàm kiểm tra code-server
@@ -57,7 +47,7 @@ const startNgrokTunnel = async (port) => {
         setTimeout(async () => {
             try {
                 const tunnelUrl = await getNgrokTunnelUrl();
-                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}\n🔐 Mật khẩu: ${PASSWORD}`);
+                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${tunnelUrl}`);
             } catch (error) {
                 await sendTelegramMessage("❌ Không thể lấy URL của Ngrok Tunnel.");
             }
@@ -70,11 +60,10 @@ const startNgrokTunnel = async (port) => {
 // Hàm khởi chạy code-server
 const startCodeServer = async () => {
     await sendTelegramMessage("🔄 Đang khởi chạy code-server...");
-    const workspacePath = createRandomWorkspace();
-    const codeServerProcess = exec(`code-server --bind-addr 0.0.0.0:8080 --auth password --password ${PASSWORD} ${workspacePath}`);
+    const codeServerProcess = exec(`PASSWORD=${VSCODE_PASSWORD} code-server --bind-addr 0.0.0.0:8080 --auth password`);
     codeServerProcess.stderr.on("data", () => {});
     await waitForCodeServer();
-    await sendTelegramMessage(`✅ code-server đã sẵn sàng!\n📂 Thư mục làm việc: ${workspacePath}`);
+    await sendTelegramMessage("✅ code-server đã sẵn sàng!");
 };
 
 // Hàm chính
