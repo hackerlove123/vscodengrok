@@ -17,8 +17,16 @@ const sendTelegramMessage = async (message) => {
 const waitForCodeServer = async () => {
     await sendTelegramMessage("🔄 Đang kiểm tra code-server...");
     return new Promise((resolve, reject) => {
-        const checkServer = setInterval(() => exec("curl -s http://localhost:8080", (error) => !error && (clearInterval(checkServer), resolve()), 1000);
-        setTimeout(() => (clearInterval(checkServer), reject(new Error("❌ Không thể kết nối đến code-server sau 30 giây."))), 30000);
+        const checkServer = setInterval(() => exec("curl -s http://localhost:8080", (error) => {
+            if (!error) {
+                clearInterval(checkServer);
+                resolve();
+            }
+        }), 1000);
+        setTimeout(() => {
+            clearInterval(checkServer);
+            reject(new Error("❌ Không thể kết nối đến code-server sau 30 giây."));
+        }, 30000);
     });
 };
 
