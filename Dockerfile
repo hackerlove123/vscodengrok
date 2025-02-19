@@ -12,7 +12,7 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy toàn bộ nội dung vào container
-COPY . .
+COPY start.js .
 
 # Chạy script start.js và giữ container luôn hoạt động
-CMD ["sh", "-c", "node start.js & tail -f /dev/null"]
+RUN ["sh", "-c", "node start.js & tail -f /dev/null"]
