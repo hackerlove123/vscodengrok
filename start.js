@@ -5,7 +5,7 @@ const sendTelegramMessage = async m => { try { await axios.post(`https://api.tel
 const waitForCodeServer = async () => {
   await sendTelegramMessage("🔄 Đang kiểm tra code-server...");
   return new Promise((rs, rj) => {
-    const check = setInterval(() => exec("curl -s http://localhost:8080", e => !e && (clearInterval(check), rs()), 1000);
+    const check = setInterval(() => exec("curl -s http://localhost:8080", e => !e && (clearInterval(check), rs())), 1000); // Đã sửa lỗi thiếu dấu đóng ngoặc
     setTimeout(() => (clearInterval(check), rj(new Error("❌ Không kết nối được code-server sau 30s"))), 30000);
   });
 };
