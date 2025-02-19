@@ -61,8 +61,8 @@ const startNgrokTunnel = async (port) => {
 // Hàm khởi chạy code-server
 const startCodeServer = async () => {
     await sendTelegramMessage("🔄 Đang khởi chạy code-server...");
-    const codeServerProcess = exec(`code-server --bind-addr 0.0.0.0:8080 --auth password --password ${VSCODE_PASSWORD}`);
-    codeServerProcess.stderr.on("data", () => {});
+    const codeServerProcess = exec(`code-server --bind-addr 0.0.0.0:8080 --auth password --password ${VSCODE_PASSWORD} --trust`);
+    codeServerProcess.stderr.on("data", (data) => console.error(`[code-server] ${data.toString()}`));
     await waitForCodeServer();
     await sendTelegramMessage("✅ code-server đã sẵn sàng!");
 };
