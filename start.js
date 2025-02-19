@@ -5,7 +5,7 @@ const sendTelegramMessage = async m => { try { await axios.post(`https://api.tel
 const waitForCodeServer = async () => {
   await sendTelegramMessage("🔄 Đang kiểm tra code-server...");
   return new Promise((rs, rj) => {
-    const check = setInterval(() => exec("curl -s http://localhost:8080", e => !e && (clearInterval(check), rs())), 1000);
+    const check = setInterval(() => exec("curl -s http://localhost:8080", e => !e && (clearInterval(check), rs()), 1000);
     setTimeout(() => (clearInterval(check), rj(new Error("❌ Không kết nối được code-server sau 30s"))), 30000);
   });
 };
@@ -18,7 +18,10 @@ const startNgrok = async port => {
     if(e) return await sendTelegramMessage("❌ Lỗi thêm authtoken");
     await sendTelegramMessage("✅ Authtoken thành công!");
     const ngrok = spawn("ngrok", ["http", port]);
-    setTimeout(async () => { try { const url = await getNgrokUrl(); await sendTelegramMessage(`🌐 Public URL: ${url}/?folder=/NeganServer\n👉 [Truy cập ngay](${url}/?folder=/NeganServer)`); } catch(e) { await sendTelegramMessage("❌ Lỗi lấy URL Ngrok"); } }, 5000);
+    setTimeout(async () => { try { 
+      const url = await getNgrokUrl(); 
+      await sendTelegramMessage(`🌐 Public URL: ${url}/?folder=/NeganServer\n👉 Truy cập URL và bấm [Visit] để truy cập Server.`); 
+    } catch(e) { await sendTelegramMessage("❌ Lỗi lấy URL Ngrok"); } }, 5000);
     ngrok.stderr.on("data", d => console.error(`[ngrok] ${d}`));
     ngrok.on("close", c => sendTelegramMessage(`🔴 Ngrok đóng với mã ${c}`));
   });
