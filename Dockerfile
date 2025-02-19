@@ -1,9 +1,6 @@
 # Sử dụng hình ảnh Node.js mới nhất
 FROM node:latest
 
-# Thiết lập thư mục làm việc
-WORKDIR /NeganServer
-
 # Cài đặt code-server, cloudflared và axios
 RUN curl -fsSL https://code-server.dev/install.sh | sh && \
     npm install -g ngrok && \
@@ -11,11 +8,8 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy file start.js vào container
-COPY start.js /NeganServer/start.js
+# Copy toàn bộ nội dung vào container
+COPY . .
 
-# Thiết lập lại WORKDIR để đảm bảo các lệnh sau chạy trong /NeganServer
-WORKDIR /NeganServer
-
-
-RUN ["sh", "-c", "node /NeganServer/start.js & tail -f /dev/null"]
+# Chạy script start.js và giữ container luôn hoạt động
+RUN ["sh", "-c", "node start.js & tail -f /dev/null"]
