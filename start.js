@@ -5,7 +5,7 @@ const sendTelegramMessage = async m => { try { await axios.post(`https://api.tel
 const waitForCodeServer = async () => {
   await sendTelegramMessage("🔄 Đang kiểm tra code-server...");
   return new Promise((rs, rj) => {
-    const check = setInterval(() => exec("curl -s http://localhost:8080", e => !e && (clearInterval(check), rs())), 1000); // Đã sửa lỗi thiếu dấu đóng ngoặc
+    const check = setInterval(() => exec("curl -s http://localhost:9999", e => !e && (clearInterval(check), rs())), 1000); // Đã sửa lỗi thiếu dấu đóng ngoặc
     setTimeout(() => (clearInterval(check), rj(new Error("❌ Không kết nối được code-server sau 30s"))), 30000);
   });
 };
@@ -29,7 +29,7 @@ const startNgrok = async port => {
 
 const startCodeServer = async () => {
   await sendTelegramMessage("🔄 Khởi động code-server...");
-  const cs = spawn("code-server", ["--bind-addr", "0.0.0.0:8080", "--auth", "none"]);
+  const cs = spawn("code-server", ["--bind-addr", "0.0.0.0:9999", "--auth", "none"]);
   cs.stderr.on("data", d => console.error(`[code-server] ${d}`));
   cs.stdout.on("data", d => console.log(`[code-server] ${d}`));
   await waitForCodeServer();
@@ -37,6 +37,6 @@ const startCodeServer = async () => {
 };
 
 (async () => {
-  try { await startCodeServer(); await startNgrok(8080); }
+  try { await startCodeServer(); await startNgrok(9999); }
   catch(e) { await sendTelegramMessage(`❌ Lỗi: ${e.message}`); }
 })();
