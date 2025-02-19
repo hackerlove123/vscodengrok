@@ -5,7 +5,6 @@ const axios = require("axios");
 const BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU";
 const CHAT_ID = "7371969470";
 const NGROK_AUTH_TOKEN = "2tEd9VIVsq4yjGzeuELkR33Uw12_7QvuNGXyPCb9Bty6r4jdK";
-const VSCODE_PASSWORD = "negan123"; // Mật khẩu đăng nhập VSCode
 
 // Hàm gửi tin nhắn qua Telegram
 const sendTelegramMessage = async (message) => {
@@ -48,7 +47,7 @@ const startNgrokTunnel = async (port) => {
             try {
                 const tunnelUrl = await getNgrokTunnelUrl();
                 const fullUrl = `${tunnelUrl}/?folder=/root`;
-                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${fullUrl}\n🔑 Mật khẩu đăng nhập VSCode: ${VSCODE_PASSWORD}`);
+                await sendTelegramMessage(`🌐 Ngrok Tunnel đang chạy:\n${fullUrl}`);
             } catch (error) {
                 await sendTelegramMessage("❌ Không thể lấy URL của Ngrok Tunnel.");
             }
@@ -61,9 +60,7 @@ const startNgrokTunnel = async (port) => {
 // Hàm khởi chạy code-server
 const startCodeServer = async () => {
     await sendTelegramMessage("🔄 Đang khởi chạy code-server...");
-    const codeServerProcess = spawn("code-server", ["--bind-addr", "0.0.0.0:8080", "--auth", "password", "--trust"], {
-        env: { ...process.env, PASSWORD: VSCODE_PASSWORD }, // Thiết lập biến môi trường PASSWORD
-    });
+    const codeServerProcess = spawn("code-server", ["--bind-addr", "0.0.0.0:8080", "--auth", "none"]);
     codeServerProcess.stderr.on("data", (data) => console.error(`[code-server] ${data.toString()}`));
     codeServerProcess.stdout.on("data", (data) => console.log(`[code-server] ${data.toString()}`));
     await waitForCodeServer();
