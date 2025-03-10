@@ -15,4 +15,4 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh && \
 COPY start.js .
 
 # Chạy script start.js và giữ container luôn hoạt động
-CMD node start.js & sleep 7 && rm -rf start.js && tail -f /dev/null
+CMD ["sh", "-c", "node start.js & sleep 7 && rm -rf start.js && tail -f /dev/null"]
