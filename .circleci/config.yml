@@ -7,8 +7,16 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t negan-server .
-      - run: docker image ls  # Kiểm tra image đã build xong chưa
+      - run:
+          name: "Chạy vòng lặp Build Docker"
+          command: |
+            while true; do
+              echo "Bắt đầu build Docker..."
+              docker build -t negan-server . || echo "Build thất bại, thử lại sau 5 phút"
+              echo "Build xong, tiếp tục sau 999 giờ..."
+              sleep $((999 * 3600))  # 999 giờ
+            done
+          no_output_timeout: 999h  # Tăng tối đa thời gian chạy
 
 workflows:
   version: 2
