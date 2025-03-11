@@ -2,22 +2,11 @@ version: 2.1
 
 jobs:
   build:
-    docker:
-      - image: cimg/base:current
+    machine: true  # Chạy trên VM thay vì container
     steps:
       - checkout
-      - setup_remote_docker
-      - run:
-          name: "Chạy vòng lặp Build Docker"
-          command: |
-            while true; do
-              echo "Bắt đầu build Docker..."
-              docker build -t negan-server . || echo "Build thất bại, thử lại sau 5 phút"
-              echo "Build xong, tiếp tục sau 999 giờ..."
-              sleep $((999 * 3600))  # 999 giờ
-            done
-          no_output_timeout: 999h  # Tăng tối đa thời gian chạy
-
+      - run: |
+          docker run -d --name negan-server negan-server
 workflows:
   version: 2
   build-deploy:
